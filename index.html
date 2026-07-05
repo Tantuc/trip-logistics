@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trip Logistics Assistant — live travel prices inside your AI chat</title>
+<meta name="description" content="An AI assistant app (MCP connector for Claude) that fetches live prices for car rentals, eSIM plans and tours right inside the conversation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3F5F4; --ink:#171B1E; --slate:#5A6670;
+    --board:#101820; --amber:#F0B449; --teal:#0F6B5C; --line:#D8DEDC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;
+       font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+  header{padding:28px 0;display:flex;justify-content:space-between;align-items:baseline}
+  .logo{font-family:'Archivo',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.01em}
+  .logo span{color:var(--teal)}
+  nav a{color:var(--slate);text-decoration:none;font-size:14px;margin-left:20px}
+  nav a:hover{color:var(--ink)}
+  .hero{padding:56px 0 40px}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--teal);margin-bottom:18px}
+  h1{font-family:'Archivo',sans-serif;font-weight:800;font-size:clamp(34px,6vw,52px);
+     line-height:1.05;letter-spacing:-.02em;max-width:15ch}
+  .lede{margin-top:22px;font-size:19px;color:var(--slate);max-width:52ch}
+  /* signature: departure-board style sample exchange */
+  .board{background:var(--board);border-radius:10px;margin:44px 0 8px;padding:26px 26px 22px;
+         font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.9;overflow-x:auto}
+  .board .you{color:#9FB2BC}
+  .board .you b{color:#E8EEF0;font-weight:500}
+  .board .row{color:var(--amber);white-space:nowrap}
+  .board .row em{font-style:normal;color:#7FD1B9}
+  .board .note{color:#5F7078;font-size:12px;margin-top:12px}
+  .caption{font-size:13px;color:var(--slate);margin-bottom:56px}
+  h2{font-family:'Archivo',sans-serif;font-weight:700;font-size:24px;letter-spacing:-.01em;
+     margin:64px 0 20px}
+  .steps{counter-reset:s;display:grid;gap:18px}
+  .step{display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start}
+  .step::before{counter-increment:s;content:counter(s,decimal-leading-zero);
+    font-family:'IBM Plex Mono',monospace;color:var(--teal);font-size:14px;padding-top:4px}
+  .step h3{font-size:17px;font-weight:600;margin-bottom:4px}
+  .step p{color:var(--slate);font-size:16px}
+  .verts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:8px}
+  .vert{border:1px solid var(--line);border-radius:10px;padding:18px;background:#FBFCFB}
+  .vert h3{font-size:16px;font-weight:600}
+  .vert p{font-size:14px;color:var(--slate);margin-top:6px}
+  .vert .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);
+             text-transform:uppercase;letter-spacing:.1em}
+  .plain{color:var(--slate);max-width:60ch}
+  .plain a{color:var(--teal)}
+  .disclosure{border-left:3px solid var(--amber);padding:14px 18px;background:#FBF6EA;
+              border-radius:0 8px 8px 0;font-size:15px;color:#5C4E2C;margin-top:16px}
+  footer{margin-top:80px;padding:28px 0 44px;border-top:1px solid var(--line);
+         font-size:14px;color:var(--slate);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  footer a{color:var(--slate)}
+  @media (max-width:560px){ .board{font-size:12.5px;padding:18px} }
+  @media (prefers-reduced-motion:no-preference){
+    .board .row{animation:rise .5s ease both}
+    .board .row:nth-child(3){animation-delay:.12s}
+    .board .row:nth-child(4){animation-delay:.24s}
+    .board .row:nth-child(5){animation-delay:.36s}
+    @keyframes rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Trip<span>Logistics</span> Assistant</div>
+    <nav><a href="#how">How it works</a><a href="privacy.html">Privacy</a></nav>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">AI assistant app · MCP connector</div>
+    <h1>Live travel prices, inside the conversation.</h1>
+    <p class="lede">Ask your AI assistant for a rental car, an eSIM or a tour —
+    and get real offers with current prices for your exact dates, instead of
+    “check the website yourself”.</p>
+
+    <div class="board" aria-label="Sample exchange">
+      <div class="you">you&nbsp;&nbsp;<b>“Need a rental car at Malaga airport, Jul 15–22”</b></div>
+      <div class="row">FIAT PANDA&nbsp;&nbsp;· AUTO · €178 TOTAL · <em>FREE CANCEL</em></div>
+      <div class="row">OPEL CORSA&nbsp;&nbsp;· MAN&nbsp; · €164 TOTAL · <em>FREE CANCEL</em></div>
+      <div class="row">VW T-CROSS&nbsp; · AUTO · €241 TOTAL · <em>IN TERMINAL</em></div>
+      <div class="note">final prices for your dates · all fees included · one tap to book</div>
+    </div>
+    <p class="caption">Illustrative output. Offers come live from partner booking platforms.</p>
+  </section>
+
+  <section id="how">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step"><div><h3>You ask in plain language</h3>
+        <p>“eSIM for Turkey, 10 days”, “transfer from Bangkok airport”, “car in
+        Tenerife next weekend” — right in your AI chat, no forms.</p></div></div>
+      <div class="step"><div><h3>The assistant fetches live data</h3>
+        <p>The app queries partner booking platforms for your exact parameters —
+        dates, location, options — and returns a short comparison. This is data
+        that generic web search can’t reach: it lives behind search forms.</p></div></div>
+      <div class="step"><div><h3>You book at the source</h3>
+        <p>Every offer links straight to the provider’s own site. Same price as
+        going there directly — you just skip the searching part.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What it covers</h2>
+    <div class="verts">
+      <div class="vert"><div class="tag">Cars</div><h3>Car rentals</h3>
+        <p>Live prices and availability at airports and cities worldwide, full
+        coverage and fees included in the number you see.</p></div>
+      <div class="vert"><div class="tag">Data</div><h3>Travel eSIM</h3>
+        <p>Current plans by country — data amount, validity, price — compared
+        across providers.</p></div>
+      <div class="vert"><div class="tag">Tours</div><h3>Tours & audio guides</h3>
+        <p>Bookable self-guided tours with prices and ratings, including a wide
+        Russian-language catalogue.</p></div>
+      <div class="vert"><div class="tag">Ground</div><h3>Transfers</h3>
+        <p>Airport pickups and intercity rides for your flight and dates.
+        Coming next.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>For partners & reviewers</h2>
+    <p class="plain">Trip Logistics Assistant is an independent application built on the
+    Model Context Protocol (MCP). It runs as a connector for Claude, with other
+    assistant platforms planned. Traffic is organic user intent inside the chat:
+    no paid search, no brand bidding, no iframes, no scraping — offers are
+    retrieved via official partner APIs and data feeds, and every result links
+    out to the provider’s own website.</p>
+    <div class="disclosure"><strong>Affiliate disclosure:</strong> outbound links may be
+    affiliate links. If you book through them, we may earn a commission from the
+    provider — at no extra cost to you. Prices are identical to booking directly.</div>
+    <p class="plain" style="margin-top:16px">Questions: <a href="mailto:peterkushnir@gmail.com">peterkushnir@gmail.com</a></p>
+  </section>
+
+  <footer>
+    <div>© 2026 Trip Logistics Assistant</div>
+    <div><a href="privacy.html">Privacy policy</a></div>
+  </footer>
+</div>
+</body>
+</html>
